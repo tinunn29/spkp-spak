@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Responden - Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'SF Pro Display', sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: #64748b;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: #475569;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Summary Header */
+        .summary-header {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .respondent-overview {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .respondent-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: #64748b;
+            color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .respondent-details h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .respondent-meta {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .survey-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .overall-score {
+            text-align: right;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(#10b981 0deg 302deg, #e5e7eb 302deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 0 auto 8px;
+        }
+
+        .score-circle::before {
+            content: '';
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .score-text {
+            position: relative;
+            z-index: 1;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .score-grade {
+            font-size: 12px;
+            color: #10b981;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Responses Analytics */
+        .responses-analytics {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .analytics-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .analytics-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: #0f172a;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Response Items */
+        .response-list {
+            padding: 0;
+        }
+
+        .response-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f8fafc;
+            display: grid;
+            grid-template-columns: 60px 1fr auto auto;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .response-item:last-child {
+            border-bottom: none;
+        }
+
+        .question-index {
+            width: 32px;
+            height: 32px;
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .question-content {
+            min-width: 0;
+        }
+
+        .question-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #0f172a;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .answer-summary {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .answer-value {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .response-score {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .score-bar-container {
+            width: 60px;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: #10b981;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .score-fraction {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .response-type {
+            background: #f8fafc;
+            color: #64748b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .response-type.multiple-choice {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .response-type.checkbox {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .response-type.rating {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .response-type.text {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        /* Detailed View */
+        .detailed-response {
+            padding: 16px;
+            background: #f8fafc;
+            margin-top: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .detailed-response.show {
+            display: block;
+        }
+
+        .option-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .option-status {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .option-status.selected {
+            background: #10b981;
+            color: white;
+        }
+
+        .option-status.unselected {
+            background: #e5e7eb;
+            color: #9ca3af;
+        }
+
+        .rating-visual {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        .star-icon {
+            width: 14px;
+            height: 14px;
+            color: #fbbf24;
+        }
+
+        .star-icon.empty {
+            color: #e5e7eb;
+        }
+
+        .text-response {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #475569;
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Export Section */
+        .export-section {
+            margin-top: 24px;
+            padding: 20px 24px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .export-info {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .export-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .export-btn:hover {
+            background: #f9fafb;
+        }
+
+        .export-btn.primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .export-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .survey-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .respondent-overview {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .survey-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .response-item {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .response-score {
+                justify-content: space-between;
+            }
+
+            .export-section {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="window.history.back()">← Kembali</button>
+            <h1 class="page-title">Detail Analisis Responden</h1>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Summary Header -->
+        <div class="summary-header">
+            <div class="respondent-overview">
+                <div class="respondent-info">
+                    <div class="avatar">DS</div>
+                    <div class="respondent-details">
+                        <h2>Dyndra Seravina</h2>
+                        <div class="respondent-meta">
+                            SPKP • Layanan Umum • 30 Juli 2025, 10:12 WIB
+                        </div>
+                    </div>
+                </div>
+
+                <div class="survey-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Pertanyaan</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">32</div>
+                        <div class="stat-label">Total Skor</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4.2</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2:34</div>
+                        <div class="stat-label">Durasi</div>
+                    </div>
+                </div>
+
+                <div class="overall-score">
+                    <div class="score-circle">
+                        <div class="score-text">84%</div>
+                    </div>
+                    <div class="score-grade">Sangat Baik</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responses Analytics -->
+        <div class="responses-analytics">
+            <div class="analytics-header">
+                <h3 class="analytics-title">Analisis Jawaban per Pertanyaan</h3>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" onclick="toggleView('summary')">Ringkasan</button>
+                    <button class="toggle-btn" onclick="toggleView('detailed')">Detail</button>
+                </div>
+            </div>
+
+            <div class="response-list">
+                <!-- Question 1 -->
+                <div class="response-item">
+                    <div class="question-index">P1</div>
+                    <div class="question-content">
+                        <div class="question-title">Persyaratan layanan mudah ditemukan</div>
+                        <div class="answer-summary">
+                            Dipilih: <span class="answer-value">Website resmi, Pengumuman di kantor</span> • Rating: <span class="answer-value">4/5</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="option-list">
+                                <div class="option-item">
+                                    <div class="option-status selected">✓</div>
+                                    <span>Website resmi</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status unselected">—</div>
+                                    <span>Media sosial</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status selected">✓</div>
+                                    <span>Pengumuman di kantor</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status unselected">—</div>
+                                    <span>Tidak tahu</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Rating kemudahan:</div>
+                                <div class="rating-visual">
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon empty">★</span>
+                                    <span style="margin-left: 8px; font-size: 12px; color: #64748b;">4 dari 5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type checkbox">Checkbox + Rating</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 75%;"></div>
+                        </div>
+                        <div class="score-fraction">6/8</div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="response-item">
+                    <div class="question-index">P2</div>
+                    <div class="question-content">
+                        <div class="question-title">Persyaratan pelayanan mudah dimengerti?</div>
+                        <div class="answer-summary">
+                            Jawaban: <span class="answer-value">Ya</span> • Rating: <span class="answer-value">5/5</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="option-list">
+                                <div class="option-item">
+                                    <div class="option-status selected">●</div>
+                                    <span>Ya</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status unselected">○</div>
+                                    <span>Tidak</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Seberapa mudah dipahami:</div>
+                                <div class="rating-visual">
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span class="star-icon">★</span>
+                                    <span style="margin-left: 8px; font-size: 12px; color: #64748b;">5 dari 5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type multiple-choice">Ya/Tidak + Rating</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 100%;"></div>
+                        </div>
+                        <div class="score-fraction">5/5</div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="response-item">
+                    <div class="question-index">P3</div>
+                    <div class="question-content">
+                        <div class="question-title">Dokumen yang diminta sesuai dengan kebutuhan pelayanan?</div>
+                        <div class="answer-summary">
+                            Jawaban: <span class="answer-value">Sangat sesuai</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="option-list">
+                                <div class="option-item">
+                                    <div class="option-status selected">●</div>
+                                    <span>Sangat sesuai</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status unselected">○</div>
+                                    <span>Cukup sesuai</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status unselected">○</div>
+                                    <span>Kurang sesuai</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status unselected">○</div>
+                                    <span>Tidak sesuai</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type multiple-choice">Multiple Choice</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 100%;"></div>
+                        </div>
+                        <div class="score-fraction">4/4</div>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="response-item">
+                    <div class="question-index">P4</div>
+                    <div class="question-content">
+                        <div class="question-title">Penilaian terhadap kecepatan waktu pelayanan</div>
+                        <div class="answer-summary">
+                            Rating: <span class="answer-value">5 bintang (Sangat Baik)</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="rating-visual">
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span style="margin-left: 8px; font-size: 13px; color: #1e293b;">5 - Sangat Baik</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type rating">Rating</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 100%;"></div>
+                        </div>
+                        <div class="score-fraction">5/5</div>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="response-item">
+                    <div class="question-index">P5</div>
+                    <div class="question-content">
+                        <div class="question-title">Penilaian terhadap kesesuaian biaya pelayanan</div>
+                        <div class="answer-summary">
+                            Rating: <span class="answer-value">4 bintang (Baik)</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="rating-visual">
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon empty">★</span>
+                                <span style="margin-left: 8px; font-size: 13px; color: #1e293b;">4 - Baik</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type rating">Rating</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 80%;"></div>
+                        </div>
+                        <div class="score-fraction">4/5</div>
+                    </div>
+                </div>
+
+                <!-- Question 6 -->
+                <div class="response-item">
+                    <div class="question-index">P6</div>
+                    <div class="question-content">
+                        <div class="question-title">Apakah ada kendala dalam proses pelayanan?</div>
+                        <div class="answer-summary">
+                            Jawaban: <span class="answer-value">Tidak</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="option-list">
+                                <div class="option-item">
+                                    <div class="option-status unselected">○</div>
+                                    <span>Ya</span>
+                                </div>
+                                <div class="option-item">
+                                    <div class="option-status selected">●</div>
+                                    <span>Tidak</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type multiple-choice">Ya/Tidak</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 100%;"></div>
+                        </div>
+                        <div class="score-fraction">3/3</div>
+                    </div>
+                </div>
+
+                <!-- Question 7 -->
+                <div class="response-item">
+                    <div class="question-index">P7</div>
+                    <div class="question-content">
+                        <div class="question-title">Penilaian terhadap kompetensi/kemampuan petugas</div>
+                        <div class="answer-summary">
+                            Rating: <span class="answer-value">5 bintang (Sangat Baik)</span>
+                        </div>
+                        <div class="detailed-response">
+                            <div class="rating-visual">
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span class="star-icon">★</span>
+                                <span style="margin-left: 8px; font-size: 13px; color: #1e293b;">5 - Sangat Baik</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type rating">Rating</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 100%;"></div>
+                        </div>
+                        <div class="score-fraction">5/5</div>
+                    </div>
+                </div>
+
+                <!-- Question 8 -->
+                <div class="response-item">
+                    <div class="question-index">P8</div>
+                    <div class="question-content">
+                        <div class="question-title">Saran dan masukan untuk perbaikan pelayanan</div>
+                        <div class="answer-summary">
+                            Memberikan saran konstruktif tentang sistem antrian digital
+                        </div>
+                        <div class="detailed-response">
+                            <div class="text-response">
+                                Pelayanan sudah sangat baik, hanya perlu ditingkatkan lagi untuk sistem antrian digitalnya agar lebih efisien. Terima kasih atas pelayanan yang memuaskan.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="response-type text">Text Input</div>
+                    <div class="response-score">
+                        <div class="score-bar-container">
+                            <div class="score-bar" style="width: 0%;"></div>
+                        </div>
+                        <div class="score-fraction">+0/3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <div class="export-info">
+                Data lengkap responden dengan 8 pertanyaan dan analisis scoring
+            </div>
+            <div class="export-actions">
+                <button class="export-btn" onclick="exportData('csv')">
+                    📊 Export CSV
+                </button>
+                <button class="export-btn" onclick="exportData('excel')">
+                    📈 Export Excel
+                </button>
+                <button class="export-btn primary" onclick="exportData('pdf')">
+                    📄 Export PDF
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleView(view) {
+            const buttons = document.querySelectorAll('.toggle-btn');
+            const detailedResponses = document.querySelectorAll('.detailed-response');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (view === 'detailed') {
+                event.target.classList.add('active');
+                detailedResponses.forEach(response => response.classList.add('show'));
+            } else {
+                buttons[0].classList.add('active');
+                detailedResponses.forEach(response => response
