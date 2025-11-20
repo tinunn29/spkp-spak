@@ -13,26 +13,32 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f1e8 0%, #e8dcc0 100%);
+            background: linear-gradient(135deg, #f5f1e8 0%, #e8dcc0 50%, #d4c5a0 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
         .login-container {
-            background: linear-gradient(145deg, #f0ead6, #e6dcc4);
-            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
             box-shadow: 
-                15px 15px 30px rgba(0, 0, 0, 0.1),
-                -15px -15px 30px rgba(255, 255, 255, 0.8),
-                inset 3px 3px 6px rgba(0, 0, 0, 0.05),
-                inset -3px -3px 6px rgba(255, 255, 255, 0.7);
-            padding: 50px 60px;
+                0 25px 60px rgba(0, 0, 0, 0.15),
+                0 10px 30px rgba(184, 149, 107, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            padding: 60px 70px;
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
             text-align: center;
+            position: relative;
+            z-index: 10;
+            animation: fadeInUp 0.8s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .logo {
@@ -68,44 +74,69 @@
         }
 
         .form-group {
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             text-align: left;
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 12px;
-            font-size: 16px;
+            margin-bottom: 10px;
+            font-size: 15px;
             color: #6b5710;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 22px;
+            top: 65%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #a08c5a;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            z-index: 2;
         }
 
         .input-field {
             width: 100%;
-            padding: 18px 25px;
+            padding: 18px 25px 18px 55px;
             font-size: 16px;
-            border: none;
-            border-radius: 50px;
-            background: linear-gradient(145deg, #e8dcc0, #f0ead6);
-            box-shadow: 
-                inset 8px 8px 16px rgba(0, 0, 0, 0.1),
-                inset -8px -8px 16px rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(184, 149, 107, 0.15);
+            border-radius: 15px;
+            background: linear-gradient(145deg, #fafaf8, #f5f3ed);
             color: #5a4a0f;
             outline: none;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
         }
 
         .input-field::placeholder {
             color: #a08c5a;
-            opacity: 0.8;
+            opacity: 0.6;
         }
 
         .input-field:focus {
+            border-color: #b8956b
+            background: white;
             box-shadow: 
-                inset 10px 10px 20px rgba(0, 0, 0, 0.12),
-                inset -10px -10px 20px rgba(255, 255, 255, 0.95),
-                0 0 0 3px rgba(212, 175, 55, 0.3);
+                0 8px 25px rgba(184, 149, 107, 0.15),
+                0 0 0 4px rgba(184, 149, 107, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input-field:focus + .input-icon {
+            color: #8b6914;
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
         }
 
         .login-btn {
@@ -199,6 +230,7 @@
                     placeholder="Username"
                     required
                 >
+                <span class="input-icon">👤</span>
             </div>
             
             <div class="form-group">
@@ -211,6 +243,7 @@
                     placeholder="Password"
                     required
                 >
+                <span class="input-icon">🔒</span>
             </div>
             
             <button type="submit" class="login-btn">Login</button>

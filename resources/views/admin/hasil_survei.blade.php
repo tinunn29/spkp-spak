@@ -477,7 +477,7 @@
                 <div class="logo-img img">
                     <img src="images/logo_bogor.svg" alt="Logo Bogor">
                 </div>
-                <h1 class="page-title">Manajemen Pertanyaan Survei</h1>
+                <h1 class="page-title">Lihat & Kelola Hasil Survei</h1>
             </div>
         </div>
         <div class="user-section">
